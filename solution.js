@@ -140,3 +140,143 @@ console.log(chaining(songs1, song1_4)); // => ['Cantaloop']
 console.log(chaining(songs2, song2_1)); // => ['Bye Bye Bye', 'Bye Bye Baby', 'Baby Ride Easy', 'Easy Money', 'Money for Nothing', 'Nothing at All', 'All Right Now']
 console.log(chaining(songs2, song2_2)); // => ['Bye Bye Love', 'Love Me Do', 'Do You Feel Like We Do', 'Do You Believe in Magic']
 console.log(chaining(songs3, song3_1)); // => ['Love Me Do', 'Do You Believe in Magic', 'Magic Man', 'Man In The Mirror']
+
+"use strict";
+
+const logs1 = [
+  ["200", "user_1", "resource_5"],
+  ["3", "user_1", "resource_1"],
+  ["620", "user_1", "resource_1"],
+  ["620", "user_3", "resource_1"],
+  ["34", "user_6", "resource_2"],
+  ["95", "user_9", "resource_1"],
+  ["416", "user_6", "resource_1"],
+  ["58523", "user_3", "resource_1"],
+  ["53760", "user_3", "resource_3"],
+  ["58522", "user_22", "resource_1"],
+  ["100", "user_3", "resource_6"],
+  ["400", "user_6", "resource_2"]
+];
+
+const logs2 = [
+  ["357", "user", "resource_2"],
+  ["1262", "user", "resource_1"],
+  ["1462", "user", "resource_2"],
+  ["1060", "user", "resource_1"],
+  ["756", "user", "resource_3"],
+  ["1090", "user", "resource_3"]
+];
+
+const logs3 = [
+  ["300", "user_10", "resource_5"]
+];
+
+const logs4 = [
+  ["1", "user_96", "resource_5"],
+  ["1", "user_10", "resource_5"],
+  ["301", "user_11", "resource_5"],
+  ["301", "user_12", "resource_5"],
+  ["603", "user_12", "resource_5"],
+  ["1603", "user_12", "resource_7"]
+];
+
+const logs5 = [
+  ["300", "user_1", "resource_3"],
+  ["599", "user_1", "resource_3"],
+  ["900", "user_1", "resource_3"],
+  ["1199", "user_1", "resource_3"],
+  ["1200", "user_1", "resource_3"],
+  ["1201", "user_1", "resource_3"],
+  ["1202", "user_1", "resource_3"]
+];
+
+const user_sessions = (logs) =>
+{
+  let dictionary = {};
+  
+  for(let i = 0; i < logs.length; i += 1) {
+    let time = parseInt(logs[i][0]);
+    let username = logs[i][1];
+    let keys = Object.keys(dictionary);
+    if (keys.includes(logs[i][1])) {
+      let earliest = dictionary[username][0];
+      let latest = dictionary[username][1];
+      if (time < earliest) {
+        dictionary[username] = [time, latest];
+      } else if (time > latest) {
+        dictionary[username] = [earliest, time];
+      }
+    } else {
+      dictionary[username] = [time, time];
+    }
+  }
+  
+  return dictionary;
+};
+
+// console.log(user_sessions(logs1));
+// console.log(user_sessions(logs2));
+// console.log(user_sessions(logs3));
+// console.log(user_sessions(logs4));
+// console.log(user_sessions(logs5));
+
+const most_requested_resource = (logs) =>
+{
+  let dictionary = {}
+  
+  for (let i = 0; i < logs.length; i += 1) {
+    let time = parseInt(logs[i][0]);
+    let file = logs[i][2];
+    let keys = Object.keys(dictionary);
+    if (keys.includes(file)) {
+      dictionary[file].push(time);
+    } else {
+      dictionary[file] = [time];
+    }
+  }
+  
+  let mostResource = '';
+  let mostValue = 0;
+
+  let dictionaryKeys = Object.keys(dictionary);
+  
+  for (let i = 0; i < dictionaryKeys.length; i += 1)
+  {
+    let listOfTimes = dictionary[dictionaryKeys[i]];
+    for (let j = 0; j < listOfTimes.length; j += 1)
+    {
+      let countBefore = 0;
+      let countAfter = 0;
+      let theTime = listOfTimes[j];
+      let fiveBefore = theTime - 300;
+      let fiveAfter = theTime + 300;
+      for (let k = 0; k < listOfTimes.length; k += 1)
+      {
+        if (listOfTimes[k] >= fiveBefore && listOfTimes[k] <= theTime)
+        {
+          countBefore += 1;
+          if (countBefore > mostValue) {
+            mostResource = dictionaryKeys[i];
+            mostValue = countBefore;
+          }
+        }
+        if (listOfTimes[k] >= theTime && listOfTimes[k] <= fiveAfter)
+        {
+          countAfter += 1;
+          if (countAfter > mostValue) {
+            mostResource = dictionaryKeys[i];
+            mostValue = countAfter;
+          }
+        }
+      }
+    }
+  }
+  
+  return [mostResource, mostValue];
+}
+
+console.log(most_requested_resource(logs1)); // # => ('resource_1', 3) [resource_1 is accessed at 416, 620, 620]
+console.log(most_requested_resource(logs2)); // # => ('resource_1', 2) [resource_1 is accessed at 1060, 1262]
+console.log(most_requested_resource(logs3)); // # => ('resource_5', 1) [resource_5 is accessed at 300]
+console.log(most_requested_resource(logs4)); // # => ('resource_5', 4) [resource_5 is accessed at 1, 1, 301, 301]
+console.log(most_requested_resource(logs5)); // # => ('resource_3', 4) [resource_3 is accessed at 1199, 1200, 1201, and 1202]
